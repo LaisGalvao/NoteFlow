@@ -1,5 +1,22 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
+async function extractErrorDetails(response: Response): Promise<string> {
+  const contentType = response.headers.get('content-type') ?? '';
+
+  if (contentType.includes('application/json')) {
+    const payload = (await response.json()) as { message?: string | string[] };
+    if (Array.isArray(payload.message)) {
+      return payload.message.join(', ');
+    }
+
+    if (payload.message) {
+      return payload.message;
+    }
+  }
+
+  return '';
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -10,7 +27,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    const details = await response.text();
+    const details = await extractErrorDetails(response);
     throw new Error(`Request to ${path} failed with status ${response.status}${details ? `: ${details}` : ''}`);
   }
 
@@ -37,7 +54,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const details = await response.text();
+      const details = await extractErrorDetails(response);
       throw new Error(`Request to ${path} failed with status ${response.status}${details ? `: ${details}` : ''}`);
     }
 

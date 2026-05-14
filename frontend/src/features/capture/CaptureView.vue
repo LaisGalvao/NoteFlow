@@ -10,11 +10,13 @@ const streamRef = ref<MediaStream | null>(null);
 const selectedFile = ref<File | null>(null);
 const extractedText = ref('');
 const loading = ref(false);
+const feedbackMessage = ref('');
 
 const notesStore = useNotesStore();
 const tasksStore = useTasksStore();
 
 const MAX_TASK_TITLE_LENGTH = 60;
+const CAPTURED_NOTE_TITLE = 'Anotação capturada';
 
 const onFileChange = (event: Event) => {
   selectedFile.value = (event.target as HTMLInputElement).files?.[0] ?? null;
@@ -28,8 +30,10 @@ const startCamera = async () => {
       videoRef.value.srcObject = stream;
       await videoRef.value.play();
     }
+    feedbackMessage.value = '';
   } catch {
     streamRef.value = null;
+    feedbackMessage.value = 'Não foi possível acessar a câmera. Use o upload de imagem.';
   }
 };
 
@@ -59,6 +63,9 @@ const extractText = async () => {
   try {
     const response = await api.upload<{ text: string }>('/ocr/extract', selectedFile.value);
     extractedText.value = response.text;
+    feedbackMessage.value = '';
+  } catch {
+    feedbackMessage.value = 'Falha ao processar a imagem.';
   } finally {
     loading.value = false;
   }
@@ -66,7 +73,7 @@ const extractText = async () => {
 
 const createNoteFromText = async () => {
   if (!extractedText.value.trim()) return;
-  await notesStore.createNote({ content: extractedText.value, title: 'Anotação capturada' });
+  await notesStore.createNote({ content: extractedText.value, title: CAPTURED_NOTE_TITLE });
 };
 
 const createTaskFromText = async () => {
@@ -96,6 +103,8 @@ onBeforeUnmount(() => {
         {{ loading ? 'Processando...' : 'Extrair texto' }}
       </button>
     </div>
+
+    <p v-if="feedbackMessage" class="text-sm text-orange-300">{{ feedbackMessage }}</p>
 
     <textarea v-model="extractedText" class="h-32 w-full rounded-xl bg-zinc-900 p-3" placeholder="Texto extraído aparece aqui" />
 
