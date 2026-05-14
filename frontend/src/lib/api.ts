@@ -10,7 +10,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Erro ${response.status}`);
+    const details = await response.text();
+    throw new Error(`Request to ${path} failed with status ${response.status}${details ? `: ${details}` : ''}`);
   }
 
   if (response.status === 204) {
@@ -36,7 +37,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro ${response.status}`);
+      const details = await response.text();
+      throw new Error(`Request to ${path} failed with status ${response.status}${details ? `: ${details}` : ''}`);
     }
 
     return response.json() as Promise<T>;
