@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 
+const MAX_AUTO_TITLE_LENGTH = 40;
+
 @Injectable()
 export class NotesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -15,7 +17,10 @@ export class NotesService {
     const content = dto.content.trim();
     return this.prisma.note.create({
       data: {
-        title: dto.title?.trim() || content.slice(0, 40) || 'Nova anotação',
+        title:
+          dto.title?.trim() ||
+          content.slice(0, MAX_AUTO_TITLE_LENGTH) ||
+          'Nova anotação',
         content,
       },
     });

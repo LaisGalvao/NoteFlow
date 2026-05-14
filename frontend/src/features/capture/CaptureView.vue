@@ -14,6 +14,8 @@ const loading = ref(false);
 const notesStore = useNotesStore();
 const tasksStore = useTasksStore();
 
+const MAX_TASK_TITLE_LENGTH = 60;
+
 const onFileChange = (event: Event) => {
   selectedFile.value = (event.target as HTMLInputElement).files?.[0] ?? null;
 };
@@ -69,7 +71,7 @@ const createNoteFromText = async () => {
 
 const createTaskFromText = async () => {
   if (!extractedText.value.trim()) return;
-  await tasksStore.createTask({ title: extractedText.value.slice(0, 60), description: extractedText.value, status: 'TODO' as TaskStatus });
+  await tasksStore.createTask({ title: extractedText.value.slice(0, MAX_TASK_TITLE_LENGTH), description: extractedText.value, status: 'TODO' as TaskStatus });
 };
 
 onMounted(() => {
