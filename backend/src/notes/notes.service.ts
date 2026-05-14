@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 
-const MAX_AUTO_TITLE_LENGTH = 40;
+const MAX_AUTO_TITLE_LENGTH = 60;
 
 @Injectable()
 export class NotesService {

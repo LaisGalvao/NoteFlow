@@ -16,7 +16,7 @@ const notesStore = useNotesStore();
 const tasksStore = useTasksStore();
 
 const MAX_TASK_TITLE_LENGTH = 60;
-const CAPTURED_NOTE_TITLE = 'Anotação capturada';
+const DEFAULT_CAPTURED_NOTE_TITLE = 'Anotação capturada';
 
 const onFileChange = (event: Event) => {
   selectedFile.value = (event.target as HTMLInputElement).files?.[0] ?? null;
@@ -73,7 +73,7 @@ const extractText = async () => {
 
 const createNoteFromText = async () => {
   if (!extractedText.value.trim()) return;
-  await notesStore.createNote({ content: extractedText.value, title: CAPTURED_NOTE_TITLE });
+  await notesStore.createNote({ content: extractedText.value, title: DEFAULT_CAPTURED_NOTE_TITLE });
 };
 
 const createTaskFromText = async () => {
